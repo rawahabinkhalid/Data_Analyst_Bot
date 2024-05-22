@@ -1,7 +1,6 @@
 langchain
 langchain-core
-langchain-output-parsers
-langchain-community
+
 sqlite3
 panda
 streamlit
