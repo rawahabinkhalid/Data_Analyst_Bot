@@ -1,5 +1,4 @@
 from langchain.agents import AgentType
-from langchain_community.agent_toolkits import create_sql_agent
 from langchain.callbacks import StreamlitCallbackHandler
 from langchain.chat_models import ChatOpenAI
 import streamlit as st
