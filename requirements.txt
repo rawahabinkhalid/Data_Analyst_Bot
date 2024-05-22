@@ -1,6 +1,5 @@
 langchain
 langchain-core
-
 sqlite3
 panda
 streamlit
