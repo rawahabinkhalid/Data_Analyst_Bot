@@ -72,7 +72,12 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
              st.write(response)
 
         else:
-             #Generating final report
+            #Generating final report
             report = generate_report(question, response, llm)
-            st.write(report)
-            st.session_state.messages.append({"role": "assistant", "content": report})
+
+            if "database is missing" in report.lower():
+                st.write(response)
+                
+            else:
+                st.write(report)
+                st.session_state.messages.append({"role": "assistant", "content": report})
