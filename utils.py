@@ -229,7 +229,7 @@ def generate_report(user_question, kpi_data, llm):
         You will start directly from the answer.
         You will not output or assume anything from your own, Just output the answer.
 
-        After Writing the report double check the formatting of report and make it proper.
+        After Writing the report double check formatting of numbers and text.
 
         If you will not follow the guidelines you will be penalized
 
