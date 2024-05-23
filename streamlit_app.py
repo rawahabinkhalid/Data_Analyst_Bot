@@ -28,7 +28,7 @@ db = SQLDatabase.from_uri(db_uri)
 st.set_page_config(page_title="LangChain: Chat with Data Analyst", page_icon="🦜")
 st.title("🦜 LangChain: Chat with Data Analyst")
 
-print("hello")
+
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
 
@@ -55,8 +55,8 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
     
     DDL = get_tables_ddl(db_uri)  
 
-    print(DDL)
-    st.write(DDL)
+    #print(DDL)
+    #st.write(DDL)
     
     with st.chat_message("assistant"):
 
@@ -65,7 +65,7 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
 
         #Generating KPIs from DDL
         kpi_list = generate_kpi(question, DDL, llm)
-        #st.write(kpi_list)
+        st.write(kpi_list)
         #print(kpi_list)
 
         #Fetching aggregated KPIs
