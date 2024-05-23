@@ -58,7 +58,8 @@ def generate_kpi(user_question, ddl_info, llm):
     of all the tables in the database. 
     I will give you a question which will contain the name of columns and DDL information which contains the data in answer to the
     question.
-    Also make sure that in description of KPI you also specify where required on which column "order by" clause will benefit more for analysis.
+    Also make sure that in description of KPI you also specify where required on which column (It should be the aggergated numeric) 
+    "order by" clause will benefit more for analysis.
     You will answer the question according to the DDL (Do not assume any other tables or columns apart from the given DDL) which is after
     analyzing question provide crucial relevant KPIs, KPIs can be aggregation of two or three columns to get good relevant insights from them. 
     You will start directly from the answer.
@@ -143,7 +144,7 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
     - Using the correct number of arguments for functions
     - Casting to the correct data type
     - Using the proper columns for joins
-    - Add Order By clause where neccessary
+    - Add Order By clause where neccessary on numeric values
 
         ================================ Human Message =================================
 
@@ -229,7 +230,7 @@ def generate_report(user_question, kpi_data, llm):
         You will start directly from the answer.
         You will not output or assume anything from your own, Just output the answer.
 
-        After Writing the report double check formatting of numbers and text.
+        After Writing the report double check the consistency of font type in text.
 
         If you will not follow the guidelines you will be penalized
 
