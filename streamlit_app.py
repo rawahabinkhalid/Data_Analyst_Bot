@@ -76,7 +76,7 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
             report = generate_report(question, response, llm)
 
             if "database is missing" in report.lower():
-                st.write(response)
+                st.write("Please try again and provide proper analysis metric")
                 
             else:
                 st.write(report)
