@@ -65,13 +65,13 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
 
         #Generating KPIs from DDL
         kpi_list = generate_kpi(question, DDL, llm)
-        st.write(kpi_list)
+        #st.write(kpi_list)
         #print(kpi_list)
 
         #Fetching aggregated KPIs
         #response = generate_sql_output_wrt_kpi("Sales by Customer Segment - Total sales value grouped by customer segment", db_uri, DDL, llm)
         response = generate_results(kpi_list, db_uri, DDL, llm)
-        
+        st.write(response)
 
         #Generating final report
         report = generate_report(question, response, llm)
