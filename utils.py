@@ -187,7 +187,7 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
         
     except Exception as ex:
         print(f"Exception in getting data: {ex}")
-        return None
+        return ex
 
 
 def generate_results(data, db_uri, ddl, llm):
