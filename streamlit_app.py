@@ -55,12 +55,8 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
     
     DDL = get_tables_ddl(db_uri)  
 
-    #print(DDL)
-    #st.write(DDL)
-
-    r =generate_sql_output_wrt_kpi("Sales by Customer Segment - Total sales value grouped by customer segment", db_uri, DDL, llm)
-    st.write(r)
     
+
     with st.chat_message("assistant"):
 
         #Fetching the latest question asked by user
@@ -68,25 +64,15 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
 
         #Generating KPIs from DDL
         kpi_list = generate_kpi(question, DDL, llm)
-        #st.write(kpi_list)
-        #print(kpi_list)
 
         #Fetching aggregated KPIs
-        #response = generate_sql_output_wrt_kpi("Sales by Customer Segment - Total sales value grouped by customer segment", db_uri, DDL, llm)
         response = generate_results(kpi_list, db_uri, DDL, llm)
-        st.write(response)
 
-        #Generating final report
-        report = generate_report(question, response, llm)
-        st.write(report)
-        st.session_state.messages.append({"role": "assistant", "content": report})
+        if response == "Please try again and provide proper analysis metric":
+             st.write(response)
 
-        
-
-        # if response["output"] == "Agent stopped due to iteration limit or time limit.":
-
-        #     st.write("Please try again! With simple instructions")
-
-        # else:
-
-        #     st.write(response["output"])
+        else:
+             #Generating final report
+            report = generate_report(question, response, llm)
+            st.write(report)
+            st.session_state.messages.append({"role": "assistant", "content": report})
