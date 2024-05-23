@@ -57,6 +57,9 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
 
     #print(DDL)
     #st.write(DDL)
+
+    r =generate_sql_output_wrt_kpi("Sales by Customer Segment - Total sales value grouped by customer segment", db_uri, DDL, llm)
+    st.write(r)
     
     with st.chat_message("assistant"):
 
