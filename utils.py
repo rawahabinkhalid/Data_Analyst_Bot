@@ -199,7 +199,7 @@ def generate_results(data, db_uri, ddl, llm):
         try:
             individual_kpi = ""
             for key, value in item.items():
-                individual_kpi += f"{value} - "
+                individual_kpi += f"{key} - {value} - "
 
             individual_kpi = individual_kpi.rstrip(" - ")
 
