@@ -227,9 +227,11 @@ def generate_report(user_question, kpi_data, llm):
         Use the data provided only and nothing from your own. 
         If data is not provided in data section just output following message: "database is missing"
         You will start directly from the answer.
-        You will not output or assume anything from your own, Just output the answer. 
+        You will not output or assume anything from your own, Just output the answer.
 
-         If you will not follow the guidelines you will be penalized
+        After Writing the report double check the formatting of report and make it proper.
+
+        If you will not follow the guidelines you will be penalized
 
         ================================ Question =================================
 
