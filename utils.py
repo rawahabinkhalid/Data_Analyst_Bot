@@ -224,10 +224,12 @@ def generate_report(user_question, kpi_data, llm):
         I will give you a user question and detailed KPIs data (extracted from database) all which is relevant to the user question,
         which contains all the neccesary data for detailed insight report you ahve create. 
         You will write easy to understand report.
-        Use the data provided only and nothing from your own.
+        Use the data provided only and nothing from your own. 
+        If data is not provided in data section just output following message: "database is missing"
         You will start directly from the answer.
         You will not output or assume anything from your own, Just output the answer. 
 
+         If you will not follow the guidelines you will be penalized
 
         ================================ Question =================================
 
