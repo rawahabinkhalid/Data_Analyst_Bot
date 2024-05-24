@@ -21,7 +21,7 @@ def clear_submit():
     st.session_state["submit"] = False
 
 #Importing database
-db_uri = "sqlite:///sales.db"
+db_uri = "sqlite:///sales_db.db"
 db = SQLDatabase.from_uri(db_uri)
 
 
