@@ -223,7 +223,8 @@ def generate_report(user_question, kpi_data, llm):
         I want you to act as an Expert Data Analyst who will write a detailed analytics report on user's asked question,
         extracted from the given aggregated data. 
         I will give you a user question and detailed KPIs data (extracted from database) all which is relevant to the user question,
-        which contains all the neccesary data for detailed insight report you ahve create. 
+        which contains all the neccesary data for detailed insights report you have to write properly by extracting insights and using data analysis
+        prownessof yours for this task. 
         You will write easy to understand report.
         Use the data provided only and nothing from your own. 
         If data is not provided in data section just output following message: "database is missing"
