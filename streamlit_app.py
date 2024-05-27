@@ -66,7 +66,7 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
         kpi_list = generate_kpi(question, DDL, llm)
 
         #Fetching aggregated KPIs
-        response = generate_results(kpi_list, db_uri, DDL, llm)
+        response = generate_results(question, kpi_list, db_uri, DDL, llm)
 
         if response == "Please try again and provide proper analysis metric":
              st.write(response)
