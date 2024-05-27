@@ -184,7 +184,8 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
 
         df = pd.read_sql(truncated_query, db_uri)
 
-        return df.to_markdown()
+        return df.astype(str).to_markdown()
+        #return df
         
     except Exception as ex:
         print(f"Exception in getting data: {ex}")
