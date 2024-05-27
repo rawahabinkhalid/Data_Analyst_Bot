@@ -191,11 +191,14 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
         return ex
 
 
-def generate_results(data, db_uri, ddl, llm):
+def generate_results(user_question, data, db_uri, ddl, llm):
 
     responses = "Following are the KPIs and their results extracted from database: "
 
-        #Iterating through each KPI and generating results from the database
+    result =  generate_sql_output_wrt_kpi(user_question, db_uri, ddl, llm)
+    responses = responses + "\n" + user_question + "\n Output: " + result + "\n\n"
+
+    #Iterating through each KPI and generating results from the database
     for idx, item in enumerate(data):
         try:
             individual_kpi = ""
@@ -231,7 +234,7 @@ def generate_report(user_question, kpi_data, llm):
         You will start directly from the answer.
         You will not output or assume anything from your own, Just output the answer.
 
-        After Writing the report double check the consistency of font type in text.
+        After Writing the report double check the consistency of font type in text, and also include SQL query for each KPI in report.
 
         If you will not follow the guidelines you will be penalized
 
@@ -268,7 +271,6 @@ def generate_report(user_question, kpi_data, llm):
     except Exception as ex:
         print(f"Exception in generating report: {ex}")
         return "Please try again"
-
 
 
 
