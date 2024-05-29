@@ -112,6 +112,24 @@ def generate_kpi(user_question, ddl_info, llm):
         return e
 
     
+def format_numeric_columns(df):
+    """
+    Format all numeric or float columns in the DataFrame to avoid scientific notation.
+    
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+    pd.DataFrame: The formatted DataFrame with all numeric or float columns formatted.
+    """
+    # Identify numeric columns in the DataFrame
+    numeric_columns = df.select_dtypes(include=['float64', 'float32', 'int64', 'int32']).columns
+
+    # Apply formatting to each numeric column
+    for col in numeric_columns:
+        df[col] = df[col].apply(lambda x: '{:.0f}'.format(x) if pd.notnull(x) else x)
+    
+    return df
 
 
 def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
@@ -137,6 +155,7 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
 
     Write an initial draft of the query. Then double check the SQLite query for common mistakes, including:
     - Using NOT IN with NULL values
+    - Add Order By clause only over numeric (Integer or float) column where neccessary
     - Using UNION when UNION ALL should have been used
     - Using BETWEEN for exclusive ranges
     - Data type mismatch in predicates
@@ -144,7 +163,7 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
     - Using the correct number of arguments for functions
     - Casting to the correct data type
     - Using the proper columns for joins
-    - Add Order By clause where neccessary on numeric values
+    
 
         ================================ Human Message =================================
 
@@ -184,7 +203,10 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
 
         df = pd.read_sql(truncated_query, db_uri)
 
-        return df.astype(str).to_markdown()
+        # Formatting numeric columns
+        df = format_numeric_columns(df)
+
+        return truncated_query, df.to_markdown()
         #return df
         
     except Exception as ex:
@@ -196,25 +218,29 @@ def generate_results(user_question, data, db_uri, ddl, llm):
 
     responses = "Following are the KPIs and their results extracted from database: "
 
-    result =  generate_sql_output_wrt_kpi(user_question, db_uri, ddl, llm)
-    responses = responses + "\n" + user_question + "\n Output: " + result + "\n\n"
+    try:
 
-    #Iterating through each KPI and generating results from the database
-    for idx, item in enumerate(data):
-        try:
-            individual_kpi = ""
-            for key, value in item.items():
-                individual_kpi += f"{key} - {value} - "
+        query, result =  generate_sql_output_wrt_kpi(user_question, db_uri, ddl, llm)
+        responses = responses + "\n" + user_question + "\n SQL Query: " + query +  "\n Output: " + result + "\n\n"
+        print(result)
 
-            individual_kpi = individual_kpi.rstrip(" - ")
-
-            #individual_kpi = f" {item['KPI']} - {item['Description']}"
-            result =  generate_sql_output_wrt_kpi(individual_kpi, db_uri, ddl, llm)
-            print("kpi", individual_kpi)
-            print(result)
+        #Iterating through each KPI and generating results from the database
+        for idx, item in enumerate(data):
             
-            responses = responses + "\n" + individual_kpi + "\n Output: " + result + "\n\n"
-        except Exception as e:
+                individual_kpi = ""
+                for key, value in item.items():
+                    individual_kpi += f"{key} - {value} - "
+
+                individual_kpi = individual_kpi.rstrip(" - ")
+
+                query, result =  generate_sql_output_wrt_kpi(individual_kpi, db_uri, ddl, llm)
+                responses = responses + "\n" + individual_kpi + "\n SQL Query: " + query +  "\n Output: " + result + "\n\n"
+
+                print("kpi", individual_kpi)
+                print(result)
+            
+        
+    except Exception as e:
             print(f"Exception in generating output from database: {e}")
             responses = "Please try again and provide analysis metric"
 
@@ -228,14 +254,21 @@ def generate_report(user_question, kpi_data, llm):
         extracted from the given aggregated data. 
         I will give you a user question and detailed KPIs data (extracted from database) all which is relevant to the user question,
         which contains all the neccesary data for detailed insights report you have to write properly by extracting insights and using data analysis
-        prownessof yours for this task. 
+        prowness of yours for this task. 
         You will write easy to understand report.
         Use the data provided only and nothing from your own. 
-        If data is not provided in data section just output following message: "database is missing"
         You will start directly from the answer.
         You will not output or assume anything from your own, Just output the answer.
 
-        After Writing the report double check the consistency of font type in text, and also include SQL query for each KPI in report.
+        
+        Also include Ouput data, SQL query and Insights for each KPI output in report.
+        Add a detailed properly formatted conclusion to report, summarize all key points (do mention numbers) from all other KPIs insights according to question.
+
+        If data is not provided in data section just output following message: "database is missing"
+
+        Use following text format:
+        -After Writing the report double check the consistency of font type in text, do not put any italic or bold over any text in report.
+        -Do not add any * character with any text
 
         If you will not follow the guidelines you will be penalized
 
