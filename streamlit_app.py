@@ -21,7 +21,7 @@ def clear_submit():
     st.session_state["submit"] = False
 
 #Importing database
-db_uri = "sqlite:///sales_db.db"
+db_uri = "sqlite:///sales_dataset.db"
 db = SQLDatabase.from_uri(db_uri)
 
 
@@ -55,7 +55,6 @@ if prompt := st.chat_input(placeholder="What is this data about?"):
     
     DDL = get_tables_ddl(db_uri)  
 
-    
 
     with st.chat_message("assistant"):
 
