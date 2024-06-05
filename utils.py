@@ -58,8 +58,8 @@ def generate_kpi(user_question, ddl_info, llm):
     of all the tables in the database. 
     I will give you a question which will contain the name of columns and DDL information which contains the data in answer to the
     question.
-    Also make sure that in description of KPI you also specify where required on which column (It should be the aggergated numeric) 
-    "order by" clause will benefit more for analysis.
+    Also make sure that in description of KPI you also specify where required on which column "order by" (always add this over nueric column)
+    clause will benefit more for analysis.
     You will answer the question according to the DDL (Do not assume any other tables or columns apart from the given DDL) which is after
     analyzing question provide crucial relevant KPIs, KPIs can be aggregation of two or three columns to get good relevant insights from them. 
     You will start directly from the answer.
@@ -136,15 +136,15 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
 
     DEFAULT_PROMPT = """You are a SQLite expert. Given an input question, first create a syntactically correct SQLite 
     query to run, then look at the results of the query and return the answer to the input question. Unless the user 
-    specifies in the question a specific number of examples to obtain, by default query for at most 15 results using the LIMIT
-    clause as per SQLite but if user has provided the LIMIT for query records use that instead of by default 15. 
-    You can order the results to return the most informative data in the database. Never query 
-    for all columns from a table. You must query only the columns that are needed to answer the question. Wrap each 
+    specifies in the question a specific number of examples to obtain, by default query for at most 20 results using the LIMIT
+    clause as per SQLite but if user has provided the LIMIT for query records use that instead of by default 20. 
+    You can order the results to return the most informative data in the database. You must query only the columns that are needed to answer the question. Wrap each 
     column name in double quotes (") to denote them as delimited identifiers. Pay attention to use only the column 
     names you can see in the tables below. Be careful to not query for columns that do not exist. Also, pay attention 
     to which column is in which table. Pay attention to use date('now') function to get the current date, 
     if the question involves "today". 
     Also be carefull whenever providing an aggregating query use ID column instead of text column if provided for aggregation.
+    Be Careful output only one SQL query for the asked user question KPI.
     DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the 
     database.
 
@@ -167,7 +167,7 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
 
         ================================ Human Message =================================
 
-    Question: 
+    Question KPI: 
     {input}
 
         ================================ Output Format =================================
@@ -217,7 +217,8 @@ def generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm):
 def generate_results(user_question, data, db_uri, ddl, llm):
 
     responses = "Following are the KPIs and their results extracted from database: "
-
+    dfs = []
+    individual_kpi_list =[]
     try:
 
         query, result =  generate_sql_output_wrt_kpi(user_question, db_uri, ddl, llm)
@@ -235,6 +236,8 @@ def generate_results(user_question, data, db_uri, ddl, llm):
 
                 query, result =  generate_sql_output_wrt_kpi(individual_kpi, db_uri, ddl, llm)
                 responses = responses + "\n" + individual_kpi + "\n SQL Query: " + query +  "\n Output: " + result + "\n\n"
+                dfs.append(result)
+                individual_kpi_list.append(individual_kpi)
 
                 print("kpi", individual_kpi)
                 print(result)
@@ -244,7 +247,30 @@ def generate_results(user_question, data, db_uri, ddl, llm):
             print(f"Exception in generating output from database: {e}")
             responses = "Please try again and provide analysis metric"
 
-    return responses
+    return responses, dfs, individual_kpi_list
+
+
+def generate_results_predefind_kpis(domain, data, db_uri, ddl, llm):
+
+    responses = "The domain of the Report for analysis is " + domain +", following are the KPIs and their results extracted from the database: \n\n"
+    dfs =[]
+    try:
+
+        #Iterating through each KPI and generating results from the database
+        for i,kpi in enumerate(data):
+               
+                query, result =  generate_sql_output_wrt_kpi(kpi, db_uri, ddl, llm)
+                responses = responses + "\n" + kpi + "\n SQL Query: " + query +  "\n Output: " + result + "\n\n"
+                dfs.append(result)
+                print("kpi", kpi)
+                print(result)
+            
+        
+    except Exception as e:
+            print(f"Exception in generating output from database: {e}")
+            responses = "Please try again and provide proper analysis metric"
+
+    return responses, dfs
 
 
 def generate_report(user_question, kpi_data, llm):
@@ -307,5 +333,38 @@ def generate_report(user_question, kpi_data, llm):
         return "Please try again"
 
 
+def generate_visualization_code(dataframe, user_question, llm):
+    print(f"Dataframe for Visuals: {dataframe}")
+    template_string = """
+    I want you to act as expert Data Visualization Analyst.
+    You have the dataframe and i want you to write a code which will generate best visualization for the dataframe using
+    matplotlib according to query. You will just output the code and nothing else. Always add a title to the plot.
+    Always include dataframe values in the code as it is.
 
+    Output should be all in python syntax
+
+    If you will not follow the guidelines you will be penalized
+
+    Dataframe: 
+    {dataframe}
+
+    Query:
+    {query}
+
+    code:
+    import matplotlib.pyplot as plt
+    <dataframe>
+    <plotting logic> 
+    """
+    PROMPT = PromptTemplate(input_variables=["dataframe", "query"], template=template_string)
+
+    visualization_chain = PROMPT | llm
+
+    visualization_code = visualization_chain.invoke({
+        "dataframe": dataframe,
+        "query": user_question
+    })
+
+    # print(visualization_code.content)
+    return visualization_code.content
 
